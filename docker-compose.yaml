@@ -1,0 +1,23 @@
+
+services:
+   
+  travelrent:    # Defined as SERVICE named as "travelrent"
+
+
+    build: .   # We are telling that Build the Container using our DockerFile present in this Same folder where this Docker-Compose file exists.
+
+
+    container_name: travelrent-container  # Giving the name "travelrent-container" to the Container that will be created using this Docker File.
+
+
+    ports: 
+    
+    - 8080:8080  # We are telling that Bind the PORT 8080 of Container with PORT 8080 of my HOST MACHINE i.e. My Laptop
+
+
+    env_file: 
+
+    - .env  # Load my Environment variables which i have written in ".env" file in this same folder where this Docker-Compose file exists.
+
+
+
