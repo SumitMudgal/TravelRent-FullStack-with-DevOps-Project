@@ -1,7 +1,67 @@
 
 # Date:- 09 October 2026
 
-name: TravelRent CI  # Giving my Workflow a name "TravelRent CI"
+# Earlier Code :-
+# -------------------------------------------------------------------------------------------------------
+
+# name: TravelRent CI  # Giving my Workflow a name "TravelRent CI"
+
+
+# on: 
+
+#   push:  # We are telling that Run this Workflow whenever "PUSH" Event Occurs in Repository i.e. whenever New Code changes is pushed to repository.
+
+#     branches: [main]  # Also specifically Mentioning that Run this Workflow whenever "PUSH" Event occurs only in "main" branch of this repository. Don't Run this Workflow whenever "PUSH" Event occurs on any other branch of Repository.
+
+#   pull_request:  # We are telling that Run this Workflow whenever "PULL" Event Occurs in Repository i.e. hen a developer creates or updates a Pull Request on GitHub (e.g., asking to merge code into main), not when you run git pull on your local PC.
+
+#     branches: [main]  # Also specifically Mentioning that Run this Workflow whenever "PULL" Event occurs only in "main" branch of this repository. Don't Run this Workflow whenever "PULL" Event occurs on any other branch of Repository.
+
+
+# jobs:  # Now we are going to define all the desired jobs of this Workflow.
+
+#   docker-build:  # Giving my Job-1 name as "docker-build", we can give any name.
+
+#     runs-on: ubuntu-latest  # We are telling that Run this Job on my Code in GitHub hosted "Linux Ubuntu" runner.
+
+#     steps: # Now, we will define all the steps of this Job-1 i.e. "docker-build" inside this "steps:" block.
+    
+
+#     # # Step 1: Clone/checkout the application's source code onto the GitHub runner :-
+#     - name: Checkout Repository  # Giving "Step-1" a name i.e. "Checkout Repository".
+      
+#       uses: actions/checkout@v4  # Downloads your repository onto the runner.
+
+
+#     # Step 2: Configure Docker Buildx (an extended Docker engine plugin providing multi-platform & caching features) :-
+#     - name: Set up Docker Buildx  # Giving "Step-1" a name i.e. "Set up Docker Buildx".
+
+#       uses: docker/setup-buildx-action@v3  # Prepares Docker's build tool i.e. initializes the Buildx builder instance on the runner.
+
+    
+#     # # Step 3: Build the Docker image for the TravelRent application using the Buildx setup :-
+#     - name: Build TravelRent Docker image  # Giving "Step-1" a name i.e. "Build TravelRent Docker image".
+
+#       uses: docker/build-push-action@v6  # Builds your image
+
+#       with:
+#                    # Defines the build context root path (current directory '.' containing the Dockerfile and source)
+#         context: .
+
+#         push: false # Explicitly set to false to verify the build builds successfully without pushing to Docker Hub/registry
+
+#         tags: travelrent-app:ci  # Assigns a local image name and tag for build identification during the job
+
+
+# -------------------------------------------------------------------------------------------------------
+
+
+# Date:- 09 October 2026
+
+# New Workflow Code After creating Repository in DockerHub for pushing TravelRent Images in it from Workflow only:-
+
+
+name: TravelRent CI/CD  # Giving my Workflow a name "TravelRent CI/CD"
 
 
 on: 
@@ -31,25 +91,42 @@ jobs:  # Now we are going to define all the desired jobs of this Workflow.
 
 
     # Step 2: Configure Docker Buildx (an extended Docker engine plugin providing multi-platform & caching features) :-
-    - name: Set up Docker Buildx  # Giving "Step-1" a name i.e. "Set up Docker Buildx".
+    - name: Set up Docker Buildx  # Giving "Step-2" a name i.e. "Set up Docker Buildx".
 
       uses: docker/setup-buildx-action@v3  # Prepares Docker's build tool i.e. initializes the Buildx builder instance on the runner.
 
-    
-    # # Step 3: Build the Docker image for the TravelRent application using the Buildx setup :-
-    - name: Build TravelRent Docker image  # Giving "Step-1" a name i.e. "Build TravelRent Docker image".
 
-      uses: docker/build-push-action@v6  # Builds your image
+
+    # We need one more step before this will work: we need to "Login to Docker Hub" before the "build-and-push" action. Add this Login step immediately before "Build and push Docker image" Step :-
+    
+    # Step-3: Login to Docker Hub using our DockerHub Username and Access Token i.e. Password :-
+    - name: Log in to Docker Hub  # Giving "Step-3" a name i.e. "Log in to Docker Hub".
+
+      if: github.event_name == 'push'  # Conditional execution: Runs ONLY for 'push' events, skipping "PULL_REQUEST" builds to protect credentials
+
+      uses: docker/login-action@v3  # Action that logs into Docker Hub or another container registry
+
+      with:
+
+        username: ${{ secrets.DOCKERHUB_USERNAME }}  # Retrieves Docker Hub username stored in "Repository Secrets" of this GitHub Repository, that we defined earlier.
+        
+        password: ${{ secrets.DOCKERHUB_TOKEN }}    # Retrieves Docker Hub username stored in "Repository Secrets" of this GitHub Repository, that we defined earlier.
+
+
+
+    # # Step 4: Build the Docker image for the TravelRent application using the Buildx setup :-
+    - name: Build and push TravelRent Docker image  # Giving "Step-4" a name i.e. "Build TravelRent Docker image".
+      
+      if: github.event_name == 'push'   # Conditional execution: Only builds and pushes when code is pushed.
+
+      uses: docker/build-push-action@v6  # Action to handle Docker image compilation and registry publishing i.e. (Builds Your Image)
 
       with:
                    # Defines the build context root path (current directory '.' containing the Dockerfile and source)
         context: .
 
-        push: false # Explicitly set to false to verify the build builds successfully without pushing to Docker Hub/registry
+        push: true # Tells Docker Buildx to push the compiled image directly to the registry i.e. (DockerHub Repository) upon completion
 
-        tags: travelrent-app:ci  # Assigns a local image name and tag for build identification during the job
-
-
-
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/travelrent-app:latest  # Labels the image with your Docker Hub username/repository name and 'latest' tag
 
 
