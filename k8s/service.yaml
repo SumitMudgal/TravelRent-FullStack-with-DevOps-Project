@@ -1,0 +1,28 @@
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: travelrent-service 
+
+spec:
+
+  type: NodePort # exposes the application through a port on the Kubernetes node.
+
+  selector:
+
+    app: travelrent-pods # routes traffic to Pods labelled as "app: travelrent-pods"
+
+  ports:
+
+  -  protocol: TCP
+     
+     port: 8080 # Service port.
+
+     targetPort: 8080 # port your Node.js application listens on.
+
+     nodePort: 30080 # port we'll use to access the application.
+
+
+

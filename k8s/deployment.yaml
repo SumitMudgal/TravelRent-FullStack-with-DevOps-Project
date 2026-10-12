@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: travelrent-deployment 
+
+spec:
+
+  replicas: 1
+
+  selector:
+
+    matchLabels:
+
+      app: travelrent-pods
+
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: travelrent-pods 
+
+    
+    spec:
+
+      containers:
+
+      -  name: travelrent
+
+         image: sumitmudgal123/travelrent-app:latest
+
+         ports:
+
+         -  containerPort: 8080
+
+         envFrom:
+
+         -  secretRef:
+
+              name: travelrent-secrets
+
+         
+
+
+
+
+
+
+
+
+
+
