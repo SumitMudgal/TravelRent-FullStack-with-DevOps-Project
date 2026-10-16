@@ -45,9 +45,9 @@ spec:
               name: travelrent-secrets
 
          
+# I paused the plan of Kubernetes because of non-availability of any Free Cloud Service.
 
-
-
+# Maybe in future I will do it.
 
 
 
